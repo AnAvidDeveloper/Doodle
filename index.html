@@ -1,36 +1,97 @@
 <html>
 
 <head>
-    <title>Canvas demo</title>
+    <title>Doodle</title>
+    <link rel="stylesheet" href="doodle.css">
 </head>
 
 <body>
+    <table>
+        <tr>
+            <td>
+                <span id="new"><img src="images/new-box-custom.png" /></span>
+            </td>
+            <td>
+                <span id="save"><img src="images/content-save-custom.png" /></span>
+            </td>
+            <td>
+                <span id="open"><img src="images/folder-open-custom.png" /></span>
+                <input type="file" id="fileInput" accept=".png" style="display: none;">
+            </td>
+            <td>
+                color
+                &nbsp;
+                <select id="color-select">
+                    <option value="black">black</option>
+                    <option value="white">white</option>
+                    <option value="red">red</option>
+                    <option value="orange">orange</option>
+                    <option value="yellow">yellow</option>
+                    <option value="green">green</option>        
+                    <option value="blue">blue</option>
+                    <option value="indigo">indigo</option>
+                    <option value="violet">violet</option>
+                </select>
+            </td>
+            <td id="tool-pencil-cell">
+                <span id="tool-pencil"><img src="images/pencil-outline-custom.png" /></span>
+            </td>
+            <td id="tool-rectangle-cell">
+                <span id="tool-rectangle"><img src="images/rectangle-outline-custom.png" /></span>
+            </td>            
+            <td id="tool-ellipse-cell">
+                <span id="tool-ellipse"><img src="images/ellipse-outline-custom.png" /></span>
+            </td>            
+            <td id="tool-line-cell">
+                <span id="tool-line"><img src="images/vector-line-custom.png" /></span>
+            </td>            
+        </tr>
+        <tr>
+            <td>
+                <span id="clear"><img src="images/close-custom.png" /></span>
+            </td>
+            <td>
+                <span id="undo"><img src="images/undo-custom.png" /></span>
+            </td>
+            <td>
+                <span id="redo"><img src="images/redo-custom.png" /></span>
+            </td>
+            
+            <td>
+                width
+                &nbsp;
+                <select id="width-select">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                    <option value="8">8</option>
+                    <option value="16">16</option>    
+                    <option value="32">32</option> 
+                    <option value="64">64</option>                        
+                </select>
+            </td>
+            <td id="tool-pencil-fill-cell">
+                <span id="tool-pencil-fill"><img src="images/pencil-custom.png" /></span>
+            </td>
+            <td id="tool-rectangle-fill-cell">
+                <span id="tool-rectangle-fill"><img src="images/rectangle-custom.png" /></span>
+            </td>            
+            <td id="tool-ellipse-fill-cell">
+                <span id="tool-ellipse-fill"><img src="images/ellipse-custom.png" /></span>
+            </td>              
+            <td id="tool-text-cell">
+                <span id="tool-text"><img src="images/format-text-variant-outline-custom.png" /></span>
+            </td>            
+            
+        </tr>
+    </table>
+    <br />
     <canvas id="canvas" width="490" height="490"
             style="border: 1px solid black;">
     </canvas>
-    <br />
-    <span id="clear">clear</span>
-    &nbsp;
-    <select id="color-select">
-        <option value="black">black</option>
-        <option value="white">white</option>
-        <option value="red">red</option>
-        <option value="orange">orange</option>
-        <option value="yellow">yellow</option>
-        <option value="green">green</option>        
-        <option value="blue">blue</option>
-        <option value="indigo">indigo</option>
-        <option value="violet">violet</option>
-    </select>
-    &nbsp;
-    <select id="width-select">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="4">4</option>
-        <option value="8">8</option>
-        <option value="16">16</option>        
-    </select>
-    <script src="main.js"></script>
+    
+    
+    <script src="main.js?date=202502262311"></script>
 </body>
 
 </html>

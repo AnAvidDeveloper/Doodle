@@ -1,0 +1,137 @@
+// HTML (you'd typically have this in your .html file)
+<div>
+  <i id="uploadIcon" style="cursor: pointer;">📤</i>
+  <input type="file" id="fileInput" accept=".png" style="display: none;">
+  <canvas id="myCanvas"></canvas>
+</div>
+
+// TypeScript code
+// Get DOM elements with proper typing
+const uploadIcon = document.getElementById('uploadIcon') as HTMLElement;
+const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
+const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+// Set canvas dimensions (you can adjust these)
+canvas.width = 500;
+canvas.height = 500;
+
+// Handle icon click to trigger file input
+uploadIcon.addEventListener('click', () => {
+  fileInput.click();
+});
+
+// Handle file selection and drawing
+fileInput.addEventListener('change', (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+
+  if (file && file.type === 'image/png') {
+    const reader = new FileReader();
+
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      const img = new Image();
+      
+      img.onload = () => {
+        // Clear canvas before drawing new image
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Draw image at 0,0 coordinates with original dimensions
+        ctx.drawImage(img, 0, 0);
+      };
+
+      img.src = e.target?.result as string;
+    };
+
+    reader.readAsDataURL(file);
+  } else {
+    console.error('Please select a PNG file');
+  }
+});
+
+
+// First, let's define a function to draw an ellipse
+function drawEllipse(
+    ctx: CanvasRenderingContext2D,
+    centerX: number,
+    centerY: number,
+    width: number,
+    height: number,
+    color: string = 'black'
+): void {
+    ctx.beginPath();
+    // Using bezierCurveTo to approximate an ellipse
+    const kappa = 0.5522848; // Control point offset for circle approximation
+    const ox = (width / 2) * kappa; // x offset
+    const oy = (height / 2) * kappa; // y offset
+    const xe = centerX + width / 2; // x-end
+    const ye = centerY + height / 2; // y-end
+    const xm = centerX; // x-middle
+    const ym = centerY; // y-middle
+
+    ctx.moveTo(xm, centerY - height / 2); // Start at top
+    ctx.bezierCurveTo(
+        xm + ox, centerY - height / 2,
+        xe, ym - oy,
+        xe, ym
+    );
+    ctx.bezierCurveTo(
+        xe, ym + oy,
+        xm + ox, centerY + height / 2,
+        xm, centerY + height / 2
+    );
+    ctx.bezierCurveTo(
+        xm - ox, centerY + height / 2,
+        centerX - width / 2, ym + oy,
+        centerX - width / 2, ym
+    );
+    ctx.bezierCurveTo(
+        centerX - width / 2, ym - oy,
+        xm - ox, centerY - height / 2,
+        xm, centerY - height / 2
+    );
+
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.stroke();
+}
+
+// Example usage in a complete TypeScript setup
+class EllipseDrawer {
+    private canvas: HTMLCanvasElement;
+    private ctx: CanvasRenderingContext2D;
+
+    constructor(canvasId: string) {
+        this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+        this.ctx = this.canvas.getContext('2d')!;
+        this.setupCanvas();
+    }
+
+    private setupCanvas(): void {
+        // Set canvas size
+        this.canvas.width = 400;
+        this.canvas.height = 300;
+    }
+
+    public draw(): void {
+        // Clear canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw an ellipse
+        drawEllipse(
+            this.ctx,
+            200,  // centerX
+            150,  // centerY
+            100,  // width
+            50,   // height
+            'blue' // color
+        );
+    }
+}
+
+// Usage in your HTML/TS project
+// HTML: <canvas id="myCanvas"></canvas>
+window.onload = () => {
+    const drawer = new EllipseDrawer('myCanvas');
+    drawer.draw();
+};
