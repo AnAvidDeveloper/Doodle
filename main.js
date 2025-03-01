@@ -151,7 +151,7 @@ var Ellipse = /** @class */ (function (_super) {
         var height = this.Y[1] - this.Y[0];
         var centerX = this.X[0] + width / 2;
         var centerY = this.Y[0] + height / 2;
-        context.fillStyle = this.color;
+        context.strokeStyle = this.color;
         context.lineWidth = this.lineWidth;
         var ctx = context;
         ctx.beginPath();
@@ -192,6 +192,19 @@ var Line = /** @class */ (function (_super) {
     };
     return Line;
 }(Shape));
+var LoadedBitmap = /** @class */ (function (_super) {
+    __extends(LoadedBitmap, _super);
+    function LoadedBitmap(image) {
+        var _this = _super.call(this) || this;
+        _this.image = image;
+        return _this;
+    }
+    LoadedBitmap.prototype.Draw = function (context) {
+        // Draw image at 0,0 coordinates with original dimensions
+        context.drawImage(this.image, 0, 0);
+    };
+    return LoadedBitmap;
+}(Shape));
 var DrawingApp = /** @class */ (function () {
     function DrawingApp() {
         var _this = this;
@@ -210,17 +223,17 @@ var DrawingApp = /** @class */ (function () {
                     var _a;
                     var img = new Image();
                     img.onload = function () {
-                        // Clear canvas before drawing new image
-                        _this.context.clearRect(0, 0, _this.canvas.width, _this.canvas.height);
-                        // Draw image at 0,0 coordinates with original dimensions
-                        _this.context.drawImage(img, 0, 0);
+                        _this.clearCanvas();
+                        var loadedImage = new LoadedBitmap(img);
+                        _this.shapes.push(loadedImage);
+                        _this.redraw();
                     };
                     img.src = (_a = e.target) === null || _a === void 0 ? void 0 : _a.result;
                 };
                 reader.readAsDataURL(file);
             }
             else {
-                console.error('Please select a PNG file');
+                alert('Please select a PNG file');
             }
         };
         this.saveEventHandler = function () {
@@ -387,6 +400,8 @@ var DrawingApp = /** @class */ (function () {
         for (var i = 0; i < this.shapes.length; i++) {
             this.shapes[i].Draw(this.context);
         }
+        var sizeInfo = document.getElementById("sizeInfo");
+        sizeInfo.innerText = "width: " + this.canvas.width + " height: " + this.canvas.height;
     };
     DrawingApp.prototype.clearToolSelection = function () {
         var selectedToolCells = document.getElementsByClassName("tool-selected");
@@ -418,26 +433,6 @@ var DrawingApp = /** @class */ (function () {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-    };
-    // Function to load PNG into canvas
-    DrawingApp.prototype.loadImageToCanvas = function (imagePath) {
-        var _this = this;
-        // Create new image object
-        var img = new Image();
-        // Set up onload handler
-        img.onload = function () {
-            // Set canvas size to match image
-            _this.canvas.width = img.width;
-            _this.canvas.height = img.height;
-            // Draw image to canvas
-            _this.context.drawImage(img, 0, 0);
-        };
-        // Handle loading errors
-        img.onerror = function () {
-            alert('Failed to load image');
-        };
-        // Set image source (triggers loading)
-        img.src = imagePath;
     };
     DrawingApp.prototype.undo = function () {
         var undone = this.shapes.pop();

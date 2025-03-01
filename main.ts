@@ -140,7 +140,7 @@ class Ellipse extends Rectangle {
         const centerX = this.X[0] + width / 2;
         const centerY = this.Y[0] + height / 2;
           
-        context.fillStyle = this.color;
+        context.strokeStyle = this.color;
         context.lineWidth = this.lineWidth;
         
         const ctx = context;
@@ -202,6 +202,18 @@ class Line extends Shape {
         this.Y[1] = y;
     }    
     
+}
+
+class LoadedBitmap extends Shape {
+    
+    constructor(private image: HTMLImageElement) {
+        super();
+    }
+    
+    public Draw(context: CanvasRenderingContext2D) {
+        // Draw image at 0,0 coordinates with original dimensions
+        context.drawImage(this.image, 0, 0);
+    }
 }
 
 
@@ -299,6 +311,9 @@ class DrawingApp {
         for (let i = 0; i < this.shapes.length; i++) {
             this.shapes[i].Draw(this.context);
         }
+        
+        const sizeInfo = document.getElementById("sizeInfo");
+        sizeInfo.innerText = "width: " + this.canvas.width + " height: " + this.canvas.height;
     }
     
     private clearToolSelection() {
@@ -336,31 +351,6 @@ class DrawingApp {
         document.body.removeChild(link);
     }
     
-    // Function to load PNG into canvas
-    private loadImageToCanvas(imagePath: string): void {
-        // Create new image object
-        const img = new Image();
-    
-        // Set up onload handler
-        img.onload = () => {
-            // Set canvas size to match image
-            this.canvas.width = img.width;
-            this.canvas.height = img.height;
-        
-            // Draw image to canvas
-            this.context.drawImage(img, 0, 0);
-        };
-    
-        // Handle loading errors
-        img.onerror = () => {
-            alert('Failed to load image');
-        };
-    
-        // Set image source (triggers loading)
-        img.src = imagePath;
-    }    
-
-    
     private undo() {
         let undone = this.shapes.pop();
         this.redoShapes.push(undone);
@@ -382,29 +372,30 @@ class DrawingApp {
     }
         
     private fileInputEventHandler = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
+        const target = event.target as HTMLInputElement;
+        const file = target.files?.[0];
 
-  if (file && file.type === 'image/png') {
-    const reader = new FileReader();
+        if (file && file.type === 'image/png') {
+            const reader = new FileReader();
 
-    reader.onload = (e: ProgressEvent<FileReader>) => {
-      const img = new Image();
+            reader.onload = (e: ProgressEvent<FileReader>) => {
+                const img = new Image();
       
-      img.onload = () => {
-        // Clear canvas before drawing new image
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        // Draw image at 0,0 coordinates with original dimensions
-        this.context.drawImage(img, 0, 0);
-      };
+                img.onload = () => {
+                    this.clearCanvas();
+                    
+                    const loadedImage = new LoadedBitmap(img);
+                    this.shapes.push(loadedImage);
+                    this.redraw();
+                };
 
-      img.src = e.target?.result as string;
-    };
+                img.src = e.target?.result as string;
+            };
 
-    reader.readAsDataURL(file);
-  } else {
-    console.error('Please select a PNG file');
-  }    
+            reader.readAsDataURL(file);
+        } else {
+            alert('Please select a PNG file');
+        }    
     }    
         
     private saveEventHandler = () => {
