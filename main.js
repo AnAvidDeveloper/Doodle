@@ -24,6 +24,55 @@ var Tools;
     Tools[Tools["Line"] = 6] = "Line";
     Tools[Tools["Text"] = 7] = "Text";
 })(Tools || (Tools = {}));
+function drawPath(context, x, y, stroke, strokeColor, strokeWidth, fill, fillColor) {
+    context.fillStyle = fillColor;
+    context.strokeStyle = strokeColor;
+    context.lineWidth = strokeWidth;
+    context.beginPath();
+    if (x.length == 1) {
+        // draw short line
+        context.moveTo(x[0] - 1, y[0]);
+        context.lineTo(x[0], y[0]);
+    }
+    else {
+        // move to first point
+        context.moveTo(x[0], y[0]);
+        // draw lines in sequence
+        for (var i = 1; i < x.length; i++) {
+            context.lineTo(x[i], y[i]);
+        }
+    }
+    if (stroke)
+        context.stroke();
+    if (fill)
+        context.fill();
+    context.closePath();
+}
+// First, let's define a function to draw an ellipse
+function drawEllipse(context, centerX, centerY, width, height, stroke, strokeColor, strokeWidth, fill, fillColor) {
+    context.beginPath();
+    // Using bezierCurveTo to approximate an ellipse
+    var kappa = 0.5522848; // Control point offset for circle approximation
+    var ox = (width / 2) * kappa; // x offset
+    var oy = (height / 2) * kappa; // y offset
+    var xe = centerX + width / 2; // x-end
+    var ye = centerY + height / 2; // y-end
+    var xm = centerX; // x-middle
+    var ym = centerY; // y-middle
+    context.moveTo(xm, centerY - height / 2); // Start at top
+    context.bezierCurveTo(xm + ox, centerY - height / 2, xe, ym - oy, xe, ym);
+    context.bezierCurveTo(xe, ym + oy, xm + ox, centerY + height / 2, xm, centerY + height / 2);
+    context.bezierCurveTo(xm - ox, centerY + height / 2, centerX - width / 2, ym + oy, centerX - width / 2, ym);
+    context.bezierCurveTo(centerX - width / 2, ym - oy, xm - ox, centerY - height / 2, xm, centerY - height / 2);
+    context.closePath();
+    context.strokeStyle = strokeColor;
+    context.lineWidth = strokeWidth;
+    context.fillStyle = fillColor;
+    if (stroke)
+        context.stroke();
+    if (fill)
+        context.fill();
+}
 var Shape = /** @class */ (function () {
     function Shape() {
         this.X = [];
@@ -46,24 +95,12 @@ var Shape = /** @class */ (function () {
         //this.Y.push(y);
     };
     Shape.prototype.Draw = function (context) {
-        context.strokeStyle = this.color;
-        context.lineWidth = this.lineWidth;
-        context.beginPath();
-        if (this.X.length == 1) {
-            // draw short line
-            context.moveTo(this.X[0] - 1, this.Y[0]);
-            context.lineTo(this.X[0], this.Y[0]);
+        try {
+            drawPath(context, this.X, this.Y, true, this.color, this.lineWidth, false, null);
         }
-        else {
-            // move to first point
-            context.moveTo(this.X[0], this.Y[0]);
-            // draw lines in sequence
-            for (var i = 1; i < this.X.length; i++) {
-                context.lineTo(this.X[i], this.Y[i]);
-            }
+        catch (error) {
+            alert(error.message);
         }
-        context.stroke();
-        context.closePath();
     };
     return Shape;
 }());
@@ -72,6 +109,14 @@ var Pencil = /** @class */ (function (_super) {
     function Pencil() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    Pencil.prototype.Draw = function (context) {
+        try {
+            drawPath(context, this.X, this.Y, true, this.color, this.lineWidth, false, null);
+        }
+        catch (error) {
+            alert(error.message);
+        }
+    };
     return Pencil;
 }(Shape));
 var PencilFill = /** @class */ (function (_super) {
@@ -80,24 +125,7 @@ var PencilFill = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     PencilFill.prototype.Draw = function (context) {
-        context.fillStyle = this.color;
-        context.lineWidth = this.lineWidth;
-        context.beginPath();
-        if (this.X.length == 1) {
-            // draw short line
-            context.moveTo(this.X[0] - 1, this.Y[0]);
-            context.lineTo(this.X[0], this.Y[0]);
-        }
-        else {
-            // move to first point
-            context.moveTo(this.X[0], this.Y[0]);
-            // draw lines in sequence
-            for (var i = 1; i < this.X.length; i++) {
-                context.lineTo(this.X[i], this.Y[i]);
-            }
-        }
-        context.fill();
-        context.closePath();
+        drawPath(context, this.X, this.Y, false, null, this.lineWidth, true, this.color);
     };
     return PencilFill;
 }(Pencil));
@@ -151,27 +179,23 @@ var Ellipse = /** @class */ (function (_super) {
         var height = this.Y[1] - this.Y[0];
         var centerX = this.X[0] + width / 2;
         var centerY = this.Y[0] + height / 2;
-        context.strokeStyle = this.color;
-        context.lineWidth = this.lineWidth;
-        var ctx = context;
-        ctx.beginPath();
-        // Using bezierCurveTo to approximate an ellipse
-        var kappa = 0.5522848; // Control point offset for circle approximation
-        var ox = (width / 2) * kappa; // x offset
-        var oy = (height / 2) * kappa; // y offset
-        var xe = centerX + width / 2; // x-end
-        var ye = centerY + height / 2; // y-end
-        var xm = centerX; // x-middle
-        var ym = centerY; // y-middle
-        ctx.moveTo(xm, centerY - height / 2); // Start at top
-        ctx.bezierCurveTo(xm + ox, centerY - height / 2, xe, ym - oy, xe, ym);
-        ctx.bezierCurveTo(xe, ym + oy, xm + ox, centerY + height / 2, xm, centerY + height / 2);
-        ctx.bezierCurveTo(xm - ox, centerY + height / 2, centerX - width / 2, ym + oy, centerX - width / 2, ym);
-        ctx.bezierCurveTo(centerX - width / 2, ym - oy, xm - ox, centerY - height / 2, xm, centerY - height / 2);
-        ctx.closePath();
-        ctx.stroke();
+        drawEllipse(context, centerX, centerY, width, height, true, this.color, this.lineWidth, false, null);
     };
     return Ellipse;
+}(Rectangle));
+var EllipseFill = /** @class */ (function (_super) {
+    __extends(EllipseFill, _super);
+    function EllipseFill() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    EllipseFill.prototype.Draw = function (context) {
+        var width = this.X[1] - this.X[0];
+        var height = this.Y[1] - this.Y[0];
+        var centerX = this.X[0] + width / 2;
+        var centerY = this.Y[0] + height / 2;
+        drawEllipse(context, centerX, centerY, width, height, false, this.color, this.lineWidth, true, this.color);
+    };
+    return EllipseFill;
 }(Rectangle));
 var Line = /** @class */ (function (_super) {
     __extends(Line, _super);
@@ -315,6 +339,9 @@ var DrawingApp = /** @class */ (function () {
                     break;
                 case Tools.Ellipse:
                     _this.currentShape = new Ellipse();
+                    break;
+                case Tools.EllipseFill:
+                    _this.currentShape = new EllipseFill();
                     break;
                 case Tools.Line:
                     _this.currentShape = new Line();

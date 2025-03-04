@@ -9,6 +9,96 @@ enum Tools {
     Text
 }    
 
+function drawPath(
+    context: CanvasRenderingContext2D,
+    x: number[], 
+    y: number[], 
+    stroke: boolean, 
+    strokeColor: string, 
+    strokeWidth: number,
+    fill: boolean, 
+    fillColor: string): void {
+    
+    context.fillStyle = fillColor;            
+    context.strokeStyle = strokeColor;
+    context.lineWidth = strokeWidth;
+  
+    context.beginPath();
+        
+    if (x.length == 1) {
+        // draw short line
+        context.moveTo(x[0] - 1, y[0]);
+        context.lineTo(x[0], y[0]);
+    }
+    else {
+        // move to first point
+        context.moveTo(x[0], y[0]);
+            
+        // draw lines in sequence
+        for (let i = 1; i < x.length; i++) {
+            context.lineTo(x[i], y[i]);
+        }
+            
+    }
+
+    if (stroke) context.stroke();
+    if (fill) context.fill();
+    context.closePath();        
+}
+
+// First, let's define a function to draw an ellipse
+function drawEllipse(
+    context: CanvasRenderingContext2D,
+    centerX: number,
+    centerY: number,
+    width: number,
+    height: number,
+    stroke: boolean, 
+    strokeColor: string, 
+    strokeWidth: number,
+    fill: boolean, 
+    fillColor: string): void {
+    
+    context.beginPath();
+    // Using bezierCurveTo to approximate an ellipse
+    const kappa = 0.5522848; // Control point offset for circle approximation
+    const ox = (width / 2) * kappa; // x offset
+    const oy = (height / 2) * kappa; // y offset
+    const xe = centerX + width / 2; // x-end
+    const ye = centerY + height / 2; // y-end
+    const xm = centerX; // x-middle
+    const ym = centerY; // y-middle
+
+    context.moveTo(xm, centerY - height / 2); // Start at top
+    context.bezierCurveTo(
+        xm + ox, centerY - height / 2,
+        xe, ym - oy,
+        xe, ym
+    );
+    context.bezierCurveTo(
+        xe, ym + oy,
+        xm + ox, centerY + height / 2,
+        xm, centerY + height / 2
+    );
+    context.bezierCurveTo(
+        xm - ox, centerY + height / 2,
+        centerX - width / 2, ym + oy,
+        centerX - width / 2, ym
+    );
+    context.bezierCurveTo(
+        centerX - width / 2, ym - oy,
+        xm - ox, centerY - height / 2,
+        xm, centerY - height / 2
+    );
+
+    context.closePath();
+    context.strokeStyle = strokeColor;
+    context.lineWidth = strokeWidth;
+    context.fillStyle = fillColor;
+    if (stroke) context.stroke();
+    if (fill) context.fill();
+}
+
 class Shape {
     
     protected X: number[] = [];
@@ -35,63 +125,35 @@ class Shape {
     }
     
     public Draw(context: CanvasRenderingContext2D) {
-        context.strokeStyle = this.color;
-        context.lineWidth = this.lineWidth;
-  
-        context.beginPath();
-        
-        if (this.X.length == 1) {
-            // draw short line
-            context.moveTo(this.X[0] - 1, this.Y[0]);
-            context.lineTo(this.X[0], this.Y[0]);
+       try {
+            drawPath(context, this.X, this.Y, 
+                true, this.color, this.lineWidth, false, null);
         }
-        else {
-            // move to first point
-            context.moveTo(this.X[0], this.Y[0]);
-            
-            // draw lines in sequence
-            for (let i = 1; i < this.X.length; i++) {
-                context.lineTo(this.X[i], this.Y[i]);
-            }
-            
+        catch (error: any) {
+            alert(error.message);
         }
-        
-        context.stroke();
-        context.closePath();
     }
 }
 
 class Pencil extends Shape {
+   
+    public Draw(context: CanvasRenderingContext2D) {
+        try {
+            drawPath(context, this.X, this.Y, 
+                true, this.color, this.lineWidth, false, null);
+        }
+        catch (error: any) {
+            alert(error.message);
+        }
+    }    
 }
 
-class PencilFill extends Pencil {
-    
+class PencilFill extends Pencil {   
     public Draw(context: CanvasRenderingContext2D) {
-        context.fillStyle = this.color;
-        context.lineWidth = this.lineWidth;
-  
-        context.beginPath();
-        
-        if (this.X.length == 1) {
-            // draw short line
-            context.moveTo(this.X[0] - 1, this.Y[0]);
-            context.lineTo(this.X[0], this.Y[0]);
-        }
-        else {
-            // move to first point
-            context.moveTo(this.X[0], this.Y[0]);
-            
-            // draw lines in sequence
-            for (let i = 1; i < this.X.length; i++) {
-                context.lineTo(this.X[i], this.Y[i]);
-            }
-            
-        }
-        
-        context.fill();
-        context.closePath();
-    }
-    
+        drawPath(context, this.X, this.Y, 
+            false, null, this.lineWidth, true, this.color);
+
+    }   
 }
 
 class Rectangle extends Shape {
@@ -139,52 +201,25 @@ class Ellipse extends Rectangle {
         const height = this.Y[1] - this.Y[0];      
         const centerX = this.X[0] + width / 2;
         const centerY = this.Y[0] + height / 2;
-          
-        context.strokeStyle = this.color;
-        context.lineWidth = this.lineWidth;
         
-        const ctx = context;
-        
-        ctx.beginPath();
-        // Using bezierCurveTo to approximate an ellipse
-        const kappa = 0.5522848; // Control point offset for circle approximation
-        const ox = (width / 2) * kappa; // x offset
-        const oy = (height / 2) * kappa; // y offset
-        const xe = centerX + width / 2; // x-end
-        const ye = centerY + height / 2; // y-end
-        const xm = centerX; // x-middle
-        const ym = centerY; // y-middle
-
-        ctx.moveTo(xm, centerY - height / 2); // Start at top
-        ctx.bezierCurveTo(
-            xm + ox, centerY - height / 2,
-            xe, ym - oy,
-            xe, ym
-        );
-        ctx.bezierCurveTo(
-            xe, ym + oy,
-            xm + ox, centerY + height / 2,
-            xm, centerY + height / 2
-        );
-        ctx.bezierCurveTo(
-            xm - ox, centerY + height / 2,
-            centerX - width / 2, ym + oy,
-            centerX - width / 2, ym
-        );
-        ctx.bezierCurveTo(
-            centerX - width / 2, ym - oy,
-            xm - ox, centerY - height / 2,
-            xm, centerY - height / 2
-        );
-    
-        ctx.closePath();
-        ctx.stroke();
-
-        
+        drawEllipse(context, centerX, centerY, width, height, 
+            true, this.color, this.lineWidth, false, null);
     }
     
 }
 
+class EllipseFill extends Rectangle {
+    public Draw(context: CanvasRenderingContext2D) {
+        const width = this.X[1] - this.X[0];
+        const height = this.Y[1] - this.Y[0];      
+        const centerX = this.X[0] + width / 2;
+        const centerY = this.Y[0] + height / 2;
+        
+        drawEllipse(context, centerX, centerY, width, height, 
+            false, this.color, this.lineWidth, true, this.color);
+    }
+    
+}
 
 class Line extends Shape {
    
@@ -495,6 +530,9 @@ class DrawingApp {
                 break;
             case Tools.Ellipse:
                 this.currentShape = new Ellipse();
+                break;
+            case Tools.EllipseFill:
+                this.currentShape = new EllipseFill();
                 break;
             case Tools.Line:
                 this.currentShape = new Line();
