@@ -349,7 +349,7 @@ var DrawingApp = /** @class */ (function () {
         this.releaseEventHandler = function () {
             _this.paint = false;
             _this.currentShape.End();
-            _this.currentShape = null; // clear reference
+            //this.currentShape = null;    // clear reference
             _this.redraw();
         };
         this.cancelEventHandler = function () {
@@ -395,7 +395,7 @@ var DrawingApp = /** @class */ (function () {
                     break;
                 case Tools.Text:
                     _this.currentShape = new TextShape();
-                    //alert(this.currentShape);
+                    _this.currentShape = _this.currentShape;
                     _this.textDialog.showModal();
                     break;
                 default:

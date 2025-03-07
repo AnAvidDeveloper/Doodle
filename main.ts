@@ -574,7 +574,7 @@ class DrawingApp {
     private releaseEventHandler = () => {
         this.paint = false;
         this.currentShape.End();
-        this.currentShape = null;    // clear reference
+        //this.currentShape = null;    // clear reference
         this.redraw();
     }
 
@@ -638,7 +638,7 @@ class DrawingApp {
                 break;
             case Tools.Text:
                 this.currentShape = new TextShape();
-                //alert(this.currentShape);
+                this.currentShape = this.currentShape;
                 this.textDialog.showModal();
                 break;
             default:
