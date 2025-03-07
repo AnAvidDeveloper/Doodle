@@ -2,7 +2,7 @@
 
 <head>
     <title>Doodle</title>
-    <link rel="stylesheet" href="doodle.css">
+    <link rel="stylesheet" href="doodle.css?ver=202503042035">
 </head>
 
 <body>
@@ -16,7 +16,7 @@
             </td>
             <td>
                 <span id="open"><img src="images/folder-open-custom.png" /></span>
-                <input type="file" id="fileInput" accept=".png" style="display: none;">
+                <input type="file" id="fileInput" accept=".png, .jpg, .jpeg" style="display: none;">
             </td>
             <td>
                 color
@@ -85,13 +85,71 @@
             
         </tr>
     </table>
+    
     <div id="sizeInfo"></div>
-    <canvas id="canvas" width="490" height="490"
-            style="border: 1px solid black;">
-    </canvas>
     
+    <div style="width:520px; height: 520px; overflow: scroll;">
+        <canvas id="canvas" width="490" height="490" 
+            class="doodle">
+        </canvas>
+    </div>
     
-    <script src="main.js?date=202503032059"></script>
+    <dialog id="confirmDialog">
+        <header><h2>Confirm</h2></header>
+        <section>
+            Are you sure you want to clear the doodle?
+            <br />
+            <br />
+        </section>
+        <footer>
+            <button id="clearYes">Yes</button>
+            &nbsp;
+            &nbsp;
+            <button id="clearNo">No</button>
+        </footer>
+    </dialog>
+    
+    <dialog id="newDialog">
+        <header><h2>New Doodle</h2></header>
+        <section>
+            Enter width and height for new doodle.
+            <br />
+            Width 
+            &nbsp;
+            <input type="number" id="newWidth" min="16" max="4096" value="490"/>
+            &nbsp;
+            Height
+            &nbsp;
+            <input type="number" id="newHeight" min="16" max="4096" value="490"/>
+            <br />
+            <br />
+        </section>
+        <footer>
+            <button id="newOk">OK</button>
+            &nbsp;
+            &nbsp;
+            <button id="newCancel">Cancel</button>
+        </footer>
+    </dialog>
+
+    <dialog id="textDialog">
+        <header><h2>Text</h2></header>
+        <section>
+            Enter text
+            &nbsp;
+            <input type="text" id="textEntry" value="Hello, world!"/>
+            <br />
+            <br />
+        </section>
+        <footer>
+            <button id="textOk">OK</button>
+            &nbsp;
+            &nbsp;
+            <button id="textCancel">Cancel</button>
+        </footer>
+    </dialog>
+        
+    <script src="main.js?date=202503062042"></script>
 </body>
 
 </html>

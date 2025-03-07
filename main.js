@@ -216,6 +216,19 @@ var Line = /** @class */ (function (_super) {
     };
     return Line;
 }(Shape));
+var TextShape = /** @class */ (function (_super) {
+    __extends(TextShape, _super);
+    function TextShape() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.Text = "SEAN";
+        return _this;
+    }
+    TextShape.prototype.Draw = function (context) {
+        context.fillStyle = this.color;
+        context.fillText(this.Text, this.X[0], this.Y[0]);
+    };
+    return TextShape;
+}(Shape));
 var LoadedBitmap = /** @class */ (function (_super) {
     __extends(LoadedBitmap, _super);
     function LoadedBitmap(image) {
@@ -241,13 +254,15 @@ var DrawingApp = /** @class */ (function () {
             var _a;
             var target = event.target;
             var file = (_a = target.files) === null || _a === void 0 ? void 0 : _a[0];
-            if (file && file.type === 'image/png') {
+            if (file && (file.type === 'image/png' || file.type === 'image/jpeg')) {
                 var reader = new FileReader();
                 reader.onload = function (e) {
                     var _a;
                     var img = new Image();
                     img.onload = function () {
                         _this.clearCanvas();
+                        _this.canvas.width = img.width;
+                        _this.canvas.height = img.height;
                         var loadedImage = new LoadedBitmap(img);
                         _this.shapes.push(loadedImage);
                         _this.redraw();
@@ -257,7 +272,7 @@ var DrawingApp = /** @class */ (function () {
                 reader.readAsDataURL(file);
             }
             else {
-                alert('Please select a PNG file');
+                alert('Please select a PNG or JPG file');
             }
         };
         this.saveEventHandler = function () {
@@ -267,8 +282,31 @@ var DrawingApp = /** @class */ (function () {
             var fileInput = document.getElementById("fileInput");
             fileInput.click();
         };
-        this.clearEventHandler = function () {
+        this.newEventHandler = function () {
+            _this.newDialog.showModal();
+        };
+        this.newOkEventHandler = function () {
             _this.clearCanvas();
+            // get new size and apply
+            var newHeight = document.getElementById("newHeight");
+            var newWidth = document.getElementById("newWidth");
+            _this.canvas.height = Number(newHeight.value);
+            _this.canvas.width = Number(newWidth.value);
+            _this.newDialog.close();
+            _this.redraw();
+        };
+        this.newCancelEventHandler = function () {
+            _this.newDialog.close();
+        };
+        this.clearEventHandler = function () {
+            _this.confirmDialog.showModal();
+        };
+        this.clearYesEventHandler = function () {
+            _this.confirmDialog.close();
+            _this.clearCanvas();
+        };
+        this.clearNoEventHandler = function () {
+            _this.confirmDialog.close();
         };
         this.undoEventHandler = function () {
             _this.undo();
@@ -297,6 +335,9 @@ var DrawingApp = /** @class */ (function () {
         this.lineEventHandler = function () {
             _this.selectTool(Tools.Line, "tool-line-cell");
         };
+        this.textEventHandler = function () {
+            _this.selectTool(Tools.Text, "tool-text-cell");
+        };
         this.colorChangeEventHandler = function () {
             var newColor = (document.getElementById('color-select')).value;
             _this.color = newColor;
@@ -313,6 +354,12 @@ var DrawingApp = /** @class */ (function () {
         };
         this.cancelEventHandler = function () {
             _this.paint = false;
+        };
+        this.textOkEventHandler = function () {
+            _this.textOk();
+        };
+        this.textCancelEventHandler = function () {
+            _this.textDialog.close();
         };
         this.pressEventHandler = function (e) {
             var mouseX = e.changedTouches ?
@@ -346,6 +393,11 @@ var DrawingApp = /** @class */ (function () {
                 case Tools.Line:
                     _this.currentShape = new Line();
                     break;
+                case Tools.Text:
+                    _this.currentShape = new TextShape();
+                    //alert(this.currentShape);
+                    _this.textDialog.showModal();
+                    break;
                 default:
                     _this.currentShape = new Shape();
                     break;
@@ -377,6 +429,9 @@ var DrawingApp = /** @class */ (function () {
         context.lineWidth = 1;
         this.canvas = canvas;
         this.context = context;
+        this.confirmDialog = document.getElementById('confirmDialog');
+        this.newDialog = document.getElementById('newDialog');
+        this.textDialog = document.getElementById('textDialog');
         this.redraw();
         this.createUserEvents();
     }
@@ -390,8 +445,18 @@ var DrawingApp = /** @class */ (function () {
         canvas.addEventListener("touchmove", this.dragEventHandler);
         canvas.addEventListener("touchend", this.releaseEventHandler);
         canvas.addEventListener("touchcancel", this.cancelEventHandler);
+        document.getElementById('new')
+            .addEventListener("click", this.newEventHandler);
+        document.getElementById('newOk')
+            .addEventListener("click", this.newOkEventHandler);
+        document.getElementById('newCancel')
+            .addEventListener("click", this.newCancelEventHandler);
         document.getElementById('clear')
             .addEventListener("click", this.clearEventHandler);
+        document.getElementById('clearYes')
+            .addEventListener("click", this.clearYesEventHandler);
+        document.getElementById('clearNo')
+            .addEventListener("click", this.clearNoEventHandler);
         document.getElementById('save')
             .addEventListener("click", this.saveEventHandler);
         document.getElementById('open')
@@ -412,8 +477,14 @@ var DrawingApp = /** @class */ (function () {
             .addEventListener("click", this.ellipseEventHandler);
         document.getElementById('tool-ellipse-fill')
             .addEventListener("click", this.ellipseFillEventHandler);
+        document.getElementById('tool-text')
+            .addEventListener("click", this.textEventHandler);
         document.getElementById('tool-line')
             .addEventListener("click", this.lineEventHandler);
+        document.getElementById('textOk')
+            .addEventListener("click", this.textOkEventHandler);
+        document.getElementById('textCancel')
+            .addEventListener("click", this.textCancelEventHandler);
         document.getElementById('color-select')
             .addEventListener("change", this.colorChangeEventHandler);
         document.getElementById('width-select')
@@ -477,6 +548,18 @@ var DrawingApp = /** @class */ (function () {
         this.currentShape = null;
         this.shapes = [];
         this.redoShapes = [];
+    };
+    DrawingApp.prototype.textOk = function () {
+        try {
+            var currentText = this.currentShape;
+            var textEntry = document.getElementById("textEntry");
+            currentText.Text = textEntry.value;
+            this.redraw();
+        }
+        catch (error) {
+            alert(error.message);
+        }
+        this.textDialog.close();
     };
     return DrawingApp;
 }());

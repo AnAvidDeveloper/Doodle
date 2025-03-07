@@ -239,6 +239,15 @@ class Line extends Shape {
     
 }
 
+class TextShape extends Shape {
+    public Text: string = "SEAN";
+    
+    public Draw(context: CanvasRenderingContext2D) {
+        context.fillStyle = this.color;
+        context.fillText(this.Text, this.X[0], this.Y[0]);
+    }
+}
+
 class LoadedBitmap extends Shape {
     
     constructor(private image: HTMLImageElement) {
@@ -257,6 +266,9 @@ class DrawingApp {
     private canvas: HTMLCanvasElement;
     private context: CanvasRenderingContext2D;
     private paint: boolean;
+    private confirmDialog: HTMLDialogElement;
+    private newDialog: HTMLDialogElement;
+    private textDialog: HTMLDialogElement;
     
     private shapes: Shape[] = [];
     private redoShapes: Shape[] = [];
@@ -276,6 +288,13 @@ class DrawingApp {
         this.canvas = canvas;
         this.context = context;
         
+        this.confirmDialog = document.getElementById('confirmDialog') as 
+                                HTMLDialogElement;        
+        this.newDialog = document.getElementById('newDialog') as 
+                                HTMLDialogElement;
+       this.textDialog = document.getElementById('textDialog') as 
+                                HTMLDialogElement;
+        
         this.redraw();
         this.createUserEvents();
     }
@@ -293,8 +312,23 @@ class DrawingApp {
         canvas.addEventListener("touchend", this.releaseEventHandler);
         canvas.addEventListener("touchcancel", this.cancelEventHandler);
 
+        document.getElementById('new')
+            .addEventListener("click", this.newEventHandler);
+
+        document.getElementById('newOk')
+            .addEventListener("click", this.newOkEventHandler);
+
+        document.getElementById('newCancel')
+            .addEventListener("click", this.newCancelEventHandler);
+
         document.getElementById('clear')
             .addEventListener("click", this.clearEventHandler);
+
+        document.getElementById('clearYes')
+            .addEventListener("click", this.clearYesEventHandler);
+
+        document.getElementById('clearNo')
+            .addEventListener("click", this.clearNoEventHandler);
 
         document.getElementById('save')
             .addEventListener("click", this.saveEventHandler);
@@ -326,8 +360,17 @@ class DrawingApp {
         document.getElementById('tool-ellipse-fill')
             .addEventListener("click", this.ellipseFillEventHandler);            
             
+        document.getElementById('tool-text')
+            .addEventListener("click", this.textEventHandler);            
+            
         document.getElementById('tool-line')
             .addEventListener("click", this.lineEventHandler);            
+                                    
+        document.getElementById('textOk')
+            .addEventListener("click", this.textOkEventHandler);            
+                                    
+        document.getElementById('textCancel')
+            .addEventListener("click", this.textCancelEventHandler);            
                                     
         document.getElementById('color-select')
             .addEventListener("change", this.colorChangeEventHandler);
@@ -410,7 +453,7 @@ class DrawingApp {
         const target = event.target as HTMLInputElement;
         const file = target.files?.[0];
 
-        if (file && file.type === 'image/png') {
+        if (file && (file.type === 'image/png' || file.type === 'image/jpeg')) {
             const reader = new FileReader();
 
             reader.onload = (e: ProgressEvent<FileReader>) => {
@@ -418,6 +461,9 @@ class DrawingApp {
       
                 img.onload = () => {
                     this.clearCanvas();
+                    
+                    this.canvas.width = img.width;
+                    this.canvas.height = img.height;
                     
                     const loadedImage = new LoadedBitmap(img);
                     this.shapes.push(loadedImage);
@@ -429,7 +475,7 @@ class DrawingApp {
 
             reader.readAsDataURL(file);
         } else {
-            alert('Please select a PNG file');
+            alert('Please select a PNG or JPG file');
         }    
     }    
         
@@ -442,10 +488,38 @@ class DrawingApp {
         fileInput.click();
     }
     
-    private clearEventHandler = () => {
+    private newEventHandler = () => {
+        this.newDialog.showModal();
+    }
+        
+    private newOkEventHandler = () => {
         this.clearCanvas();
+        // get new size and apply
+        const newHeight = document.getElementById("newHeight") as HTMLInputElement;
+        const newWidth = document.getElementById("newWidth") as HTMLInputElement;   
+        this.canvas.height = Number(newHeight.value);
+        this.canvas.width = Number(newWidth.value);
+        this.newDialog.close();
+        this.redraw();
+    }    
+    
+    private newCancelEventHandler = () => {
+        this.newDialog.close();
+    }
+        
+    private clearEventHandler = () => {
+        this.confirmDialog.showModal();
     }
     
+    private clearYesEventHandler = () => {
+        this.confirmDialog.close();
+        this.clearCanvas();
+    }
+        
+    private clearNoEventHandler = () => {
+        this.confirmDialog.close();
+    }
+        
     private undoEventHandler = () => {
         this.undo();
     }    
@@ -483,6 +557,10 @@ class DrawingApp {
         this.selectTool(Tools.Line, "tool-line-cell");
     }
     
+    private textEventHandler = () => {
+        this.selectTool(Tools.Text, "tool-text-cell");
+    }
+    
     private colorChangeEventHandler = () => {
         let newColor = (<HTMLSelectElement>(document.getElementById('color-select'))).value;
         this.color = newColor;
@@ -502,6 +580,27 @@ class DrawingApp {
 
     private cancelEventHandler = () => {
         this.paint = false;
+    }
+    
+    private textOk() {
+        try {
+            const currentText = this.currentShape as TextShape;
+            const textEntry = document.getElementById("textEntry") as HTMLInputElement;
+            currentText.Text = textEntry.value;
+            this.redraw();
+        }
+        catch (error: any) {
+            alert(error.message);
+        }
+        this.textDialog.close();        
+    }
+    
+    private textOkEventHandler = () => {
+        this.textOk();
+    }
+        
+    private textCancelEventHandler = () => {
+        this.textDialog.close();
     }
     
     private pressEventHandler = (e: MouseEvent | TouchEvent) => {
@@ -536,6 +635,11 @@ class DrawingApp {
                 break;
             case Tools.Line:
                 this.currentShape = new Line();
+                break;
+            case Tools.Text:
+                this.currentShape = new TextShape();
+                //alert(this.currentShape);
+                this.textDialog.showModal();
                 break;
             default:
                 this.currentShape = new Shape();
