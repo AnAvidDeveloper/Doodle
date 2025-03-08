@@ -6,8 +6,10 @@ enum Tools {
     Ellipse,
     EllipseFill,
     Line,
-    Text
+    Text,
+    TextFill
 }    
+
 
 function drawPath(
     context: CanvasRenderingContext2D,
@@ -241,9 +243,21 @@ class Line extends Shape {
 
 class TextShape extends Shape {
     public Text: string = "SEAN";
+    public Font: string = "16px serif";
+    
+    public Draw(context: CanvasRenderingContext2D) {
+        context.strokeStyle = this.color;
+        context.font = this.Font;
+        context.lineWidth = this.lineWidth;
+        context.strokeText(this.Text, this.X[0], this.Y[0]);
+    }
+}
+
+class TextFillShape extends TextShape {
     
     public Draw(context: CanvasRenderingContext2D) {
         context.fillStyle = this.color;
+        context.font = this.Font;
         context.fillText(this.Text, this.X[0], this.Y[0]);
     }
 }
@@ -292,7 +306,7 @@ class DrawingApp {
                                 HTMLDialogElement;        
         this.newDialog = document.getElementById('newDialog') as 
                                 HTMLDialogElement;
-       this.textDialog = document.getElementById('textDialog') as 
+        this.textDialog = document.getElementById('textDialog') as 
                                 HTMLDialogElement;
         
         this.redraw();
@@ -362,6 +376,9 @@ class DrawingApp {
             
         document.getElementById('tool-text')
             .addEventListener("click", this.textEventHandler);            
+            
+        document.getElementById('tool-text-fill')
+            .addEventListener("click", this.textFillEventHandler);            
             
         document.getElementById('tool-line')
             .addEventListener("click", this.lineEventHandler);            
@@ -561,6 +578,10 @@ class DrawingApp {
         this.selectTool(Tools.Text, "tool-text-cell");
     }
     
+    private textFillEventHandler = () => {
+        this.selectTool(Tools.TextFill, "tool-text-fill-cell");
+    }
+    
     private colorChangeEventHandler = () => {
         let newColor = (<HTMLSelectElement>(document.getElementById('color-select'))).value;
         this.color = newColor;
@@ -587,6 +608,8 @@ class DrawingApp {
             const currentText = this.currentShape as TextShape;
             const textEntry = document.getElementById("textEntry") as HTMLInputElement;
             currentText.Text = textEntry.value;
+            const textSize = document.getElementById("textSize") as HTMLInputElement;
+            currentText.Font = textSize.value + "px serif";
             this.redraw();
         }
         catch (error: any) {
@@ -600,7 +623,9 @@ class DrawingApp {
     }
         
     private textCancelEventHandler = () => {
+        this.shapes.pop();
         this.textDialog.close();
+        this.redraw();
     }
     
     private pressEventHandler = (e: MouseEvent | TouchEvent) => {
@@ -638,6 +663,11 @@ class DrawingApp {
                 break;
             case Tools.Text:
                 this.currentShape = new TextShape();
+                this.currentShape = this.currentShape;
+                this.textDialog.showModal();
+                break;
+            case Tools.TextFill:
+                this.currentShape = new TextFillShape();
                 this.currentShape = this.currentShape;
                 this.textDialog.showModal();
                 break;

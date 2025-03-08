@@ -42,8 +42,17 @@
             <td id="tool-ellipse-cell">
                 <span id="tool-ellipse"><img src="images/ellipse-outline-custom.png" /></span>
             </td>            
+            <td id="tool-text-cell">
+                <span id="tool-text"><img src="images/format-text-variant-outline-custom.png" /></span>
+            </td>            
             <td id="tool-line-cell">
                 <span id="tool-line"><img src="images/vector-line-custom.png" /></span>
+            </td>            
+            <td id="tool-paste-cell">
+                <span id="tool-paste"><img src="images/content-paste-custom.png" /></span>
+            </td>            
+            <td id="tool-copy-cell">
+                <span id="tool-copy"><img src="images/content-copy-custom.png" /></span>
             </td>            
         </tr>
         <tr>
@@ -79,9 +88,19 @@
             <td id="tool-ellipse-fill-cell">
                 <span id="tool-ellipse-fill"><img src="images/ellipse-custom.png" /></span>
             </td>              
-            <td id="tool-text-cell">
-                <span id="tool-text"><img src="images/format-text-variant-outline-custom.png" /></span>
+            <td id="tool-text-fill-cell">
+                <span id="tool-text-fill"><img src="images/format-text-variant-custom.png" /></span>
             </td>            
+            <td id="tool-select-cell">
+                <span id="tool-select"><img src="images/select-custom.png" /></span>
+            </td>            
+            <td id="tool-cut-cell">
+                <span id="tool-cut"><img src="images/content-cut-custom.png" /></span>
+            </td>            
+            <td id="tool-crop-cell">
+                <span id="tool-crop"><img src="images/crop-custom.png" /></span>
+            </td>            
+            
             
         </tr>
     </table>
@@ -139,6 +158,10 @@
             &nbsp;
             <input type="text" id="textEntry" value="Hello, world!"/>
             <br />
+            Size 
+            &nbsp;
+            <input type="number" id="textSize" min="6" max="72" value="12"/>
+            &nbsp;
             <br />
         </section>
         <footer>
@@ -149,7 +172,7 @@
         </footer>
     </dialog>
         
-    <script src="main.js?date=202503070142"></script>
+    <script src="main.js?date=202503080050"></script>
 </body>
 
 </html>

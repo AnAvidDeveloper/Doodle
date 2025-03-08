@@ -23,6 +23,7 @@ var Tools;
     Tools[Tools["EllipseFill"] = 5] = "EllipseFill";
     Tools[Tools["Line"] = 6] = "Line";
     Tools[Tools["Text"] = 7] = "Text";
+    Tools[Tools["TextFill"] = 8] = "TextFill";
 })(Tools || (Tools = {}));
 function drawPath(context, x, y, stroke, strokeColor, strokeWidth, fill, fillColor) {
     context.fillStyle = fillColor;
@@ -221,14 +222,29 @@ var TextShape = /** @class */ (function (_super) {
     function TextShape() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.Text = "SEAN";
+        _this.Font = "16px serif";
         return _this;
     }
     TextShape.prototype.Draw = function (context) {
-        context.fillStyle = this.color;
-        context.fillText(this.Text, this.X[0], this.Y[0]);
+        context.strokeStyle = this.color;
+        context.font = this.Font;
+        context.lineWidth = this.lineWidth;
+        context.strokeText(this.Text, this.X[0], this.Y[0]);
     };
     return TextShape;
 }(Shape));
+var TextFillShape = /** @class */ (function (_super) {
+    __extends(TextFillShape, _super);
+    function TextFillShape() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    TextFillShape.prototype.Draw = function (context) {
+        context.fillStyle = this.color;
+        context.font = this.Font;
+        context.fillText(this.Text, this.X[0], this.Y[0]);
+    };
+    return TextFillShape;
+}(TextShape));
 var LoadedBitmap = /** @class */ (function (_super) {
     __extends(LoadedBitmap, _super);
     function LoadedBitmap(image) {
@@ -338,6 +354,9 @@ var DrawingApp = /** @class */ (function () {
         this.textEventHandler = function () {
             _this.selectTool(Tools.Text, "tool-text-cell");
         };
+        this.textFillEventHandler = function () {
+            _this.selectTool(Tools.TextFill, "tool-text-fill-cell");
+        };
         this.colorChangeEventHandler = function () {
             var newColor = (document.getElementById('color-select')).value;
             _this.color = newColor;
@@ -359,7 +378,9 @@ var DrawingApp = /** @class */ (function () {
             _this.textOk();
         };
         this.textCancelEventHandler = function () {
+            _this.shapes.pop();
             _this.textDialog.close();
+            _this.redraw();
         };
         this.pressEventHandler = function (e) {
             var mouseX = e.changedTouches ?
@@ -395,6 +416,11 @@ var DrawingApp = /** @class */ (function () {
                     break;
                 case Tools.Text:
                     _this.currentShape = new TextShape();
+                    _this.currentShape = _this.currentShape;
+                    _this.textDialog.showModal();
+                    break;
+                case Tools.TextFill:
+                    _this.currentShape = new TextFillShape();
                     _this.currentShape = _this.currentShape;
                     _this.textDialog.showModal();
                     break;
@@ -479,6 +505,8 @@ var DrawingApp = /** @class */ (function () {
             .addEventListener("click", this.ellipseFillEventHandler);
         document.getElementById('tool-text')
             .addEventListener("click", this.textEventHandler);
+        document.getElementById('tool-text-fill')
+            .addEventListener("click", this.textFillEventHandler);
         document.getElementById('tool-line')
             .addEventListener("click", this.lineEventHandler);
         document.getElementById('textOk')
@@ -554,6 +582,8 @@ var DrawingApp = /** @class */ (function () {
             var currentText = this.currentShape;
             var textEntry = document.getElementById("textEntry");
             currentText.Text = textEntry.value;
+            var textSize = document.getElementById("textSize");
+            currentText.Font = textSize.value + "px serif";
             this.redraw();
         }
         catch (error) {
