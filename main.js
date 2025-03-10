@@ -357,10 +357,6 @@ var DrawingApp = /** @class */ (function () {
         this.textFillEventHandler = function () {
             _this.selectTool(Tools.TextFill, "tool-text-fill-cell");
         };
-        this.colorChangeEventHandler = function () {
-            var newColor = (document.getElementById('color-select')).value;
-            _this.color = newColor;
-        };
         this.widthChangeEventHandler = function () {
             var newWidth = (document.getElementById('width-select')).value;
             _this.context.lineWidth = parseInt(newWidth);
@@ -373,6 +369,22 @@ var DrawingApp = /** @class */ (function () {
         };
         this.cancelEventHandler = function () {
             _this.paint = false;
+        };
+        this.colorEventHandler = function (event) {
+            // clear selected color indicator from cells
+            var colorRow = document.getElementById("color-row");
+            var colorRow2 = document.getElementById("color-row2");
+            for (var i = 0; i < colorRow.children.length; i++) {
+                colorRow.children[i].innerHTML = "&nbsp;";
+                colorRow2.children[i].innerHTML = "&nbsp;";
+            }
+            // mark this cell as the selected color cell
+            var colorCell = event.target;
+            colorCell.innerText = "C";
+            // set selected color
+            var colorCellId = colorCell.id;
+            var parts = colorCellId.split("-");
+            _this.color = parts[1];
         };
         this.textOkEventHandler = function () {
             _this.textOk();
@@ -513,8 +525,13 @@ var DrawingApp = /** @class */ (function () {
             .addEventListener("click", this.textOkEventHandler);
         document.getElementById('textCancel')
             .addEventListener("click", this.textCancelEventHandler);
-        document.getElementById('color-select')
-            .addEventListener("change", this.colorChangeEventHandler);
+        var cells = document.getElementsByTagName("td");
+        for (var i = 0; i < cells.length; i++) {
+            var cell = cells[i];
+            if (cell.id.indexOf("color-") == 0) {
+                cell.addEventListener("click", this.colorEventHandler);
+            }
+        }
         document.getElementById('width-select')
             .addEventListener("change", this.widthChangeEventHandler);
         document.getElementById('fileInput')
@@ -583,7 +600,8 @@ var DrawingApp = /** @class */ (function () {
             var textEntry = document.getElementById("textEntry");
             currentText.Text = textEntry.value;
             var textSize = document.getElementById("textSize");
-            currentText.Font = textSize.value + "px serif";
+            var textFont = document.getElementById("textFont");
+            currentText.Font = textSize.value + "px " + textFont.value;
             this.redraw();
         }
         catch (error) {

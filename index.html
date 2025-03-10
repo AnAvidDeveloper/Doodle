@@ -7,6 +7,13 @@
 
 <body>
     <table>
+        <thead>
+            <tr>
+                <th colspan="3">Menu</th>
+                <th colspan="3">Line Size</th>
+                <th colspan="7">Tools</th>
+            </tr>
+        <thead>
         <tr>
             <td>
                 <span id="new"><img src="images/new-box-custom.png" /></span>
@@ -19,19 +26,13 @@
                 <input type="file" id="fileInput" accept=".png, .jpg, .jpeg" style="display: none;">
             </td>
             <td>
-                color
-                &nbsp;
-                <select id="color-select">
-                    <option value="black">black</option>
-                    <option value="white">white</option>
-                    <option value="red">red</option>
-                    <option value="orange">orange</option>
-                    <option value="yellow">yellow</option>
-                    <option value="green">green</option>        
-                    <option value="blue">blue</option>
-                    <option value="indigo">indigo</option>
-                    <option value="violet">violet</option>
-                </select>
+                1
+            </td>
+            <td>
+                2
+            </td>
+            <td>
+                4
             </td>
             <td id="tool-pencil-cell">
                 <span id="tool-pencil"><img src="images/pencil-outline-custom.png" /></span>
@@ -65,19 +66,14 @@
             <td>
                 <span id="redo"><img src="images/redo-custom.png" /></span>
             </td>
-            
             <td>
-                width
-                &nbsp;
-                <select id="width-select">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="4">4</option>
-                    <option value="8">8</option>
-                    <option value="16">16</option>    
-                    <option value="32">32</option> 
-                    <option value="64">64</option>                        
-                </select>
+                8
+            </td>
+            <td>
+                16
+            </td>
+            <td>
+                32
             </td>
             <td id="tool-pencil-fill-cell">
                 <span id="tool-pencil-fill"><img src="images/pencil-custom.png" /></span>
@@ -102,6 +98,36 @@
             </td>            
             
             
+        </tr>
+        <tr id="color-row">
+            <td id="color-black" style="background-color: black;">C</td>
+            <td id="color-gray" style="background-color: gray;"></td>
+            <td id="color-white" style="background-color: white;"></td>   
+            <td id="color-brown" style="background-color: brown;"></td>
+            <td id="color-tan" style="background-color: tan;"></td>
+            <td id="color-olive" style="background-color: olive;"></td>
+            <td id="color-red" style="background-color: red;"></td>
+            <td id="color-orange" style="background-color: orange;"></td>
+            <td id="color-yellow" style="background-color: yellow;"></td>
+            <td id="color-green" style="background-color: green;"></td>
+            <td id="color-blue" style="background-color: blue;"></td>
+            <td id="color-indigo" style="background-color: indigo;"></td>
+            <td id="color-violet" style="background-color: violet;"></td>                                                
+        </tr>
+         <tr id="color-row2">
+            <td id="color-darkGray" style="background-color: darkGray;">&nbsp;</td>
+            <td id="color-lightGray" style="background-color: lightGray;"></td>
+            <td id="color-silver" style="background-color: silver;"></td>   
+            <td id="color-sienna" style="background-color: sienna;"></td>
+            <td id="color-khaki" style="background-color: khaki;"></td>
+            <td id="color-wheat" style="background-color: wheat;"></td>
+            <td id="color-darkRed" style="background-color: darkred;"></td>
+            <td id="color-darkOrange" style="background-color: darkorange;"></td>
+            <td id="color-gold" style="background-color: gold;"></td>
+            <td id="color-darkgreen" style="background-color: darkgreen;"></td>
+            <td id="color-darkblue" style="background-color: darkblue;"></td>
+            <td id="color-darkSlateBlue" style="background-color: darkSlateBlue;"></td>
+            <td id="color-darkviolet" style="background-color: darkviolet;"></td>                                                
         </tr>
     </table>
     
@@ -158,6 +184,13 @@
             &nbsp;
             <input type="text" id="textEntry" value="Hello, world!"/>
             <br />
+            Font
+            &nbsp;
+            <select id="textFont">
+                <option value="sans-serif">sans-serif</option>
+                <option value="serif">serif</option>
+            </select>
+            &nbsp;
             Size 
             &nbsp;
             <input type="number" id="textSize" min="6" max="72" value="12"/>
@@ -172,7 +205,7 @@
         </footer>
     </dialog>
         
-    <script src="main.js?date=202503080050"></script>
+    <script src="main.js?date=202503092327"></script>
 </body>
 
 </html>

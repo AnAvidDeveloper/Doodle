@@ -389,9 +389,14 @@ class DrawingApp {
         document.getElementById('textCancel')
             .addEventListener("click", this.textCancelEventHandler);            
                                     
-        document.getElementById('color-select')
-            .addEventListener("change", this.colorChangeEventHandler);
-                  
+        const cells = document.getElementsByTagName("td");
+        for (let i = 0; i < cells.length; i++) {
+            const cell = cells[i];
+            if (cell.id.indexOf("color-") == 0) {
+                cell.addEventListener("click", this.colorEventHandler);
+            }
+        }
+                                                      
         document.getElementById('width-select')
             .addEventListener("change", this.widthChangeEventHandler);
                   
@@ -582,11 +587,6 @@ class DrawingApp {
         this.selectTool(Tools.TextFill, "tool-text-fill-cell");
     }
     
-    private colorChangeEventHandler = () => {
-        let newColor = (<HTMLSelectElement>(document.getElementById('color-select'))).value;
-        this.color = newColor;
-    }
-    
     private widthChangeEventHandler = () => {
         let newWidth = (<HTMLSelectElement>(document.getElementById('width-select'))).value;
         this.context.lineWidth = parseInt(newWidth);
@@ -609,13 +609,33 @@ class DrawingApp {
             const textEntry = document.getElementById("textEntry") as HTMLInputElement;
             currentText.Text = textEntry.value;
             const textSize = document.getElementById("textSize") as HTMLInputElement;
-            currentText.Font = textSize.value + "px serif";
+            const textFont = document.getElementById("textFont") as HTMLInputElement;            
+            currentText.Font = textSize.value + "px " + textFont.value;
             this.redraw();
         }
         catch (error: any) {
             alert(error.message);
         }
         this.textDialog.close();        
+    }
+    
+    private colorEventHandler = (event: Event) => {
+        // clear selected color indicator from cells
+        const colorRow = document.getElementById("color-row") as HTMLElement;
+        const colorRow2 = document.getElementById("color-row2") as HTMLElement;
+        for (let i = 0; i < colorRow.children.length; i++) {
+            colorRow.children[i].innerHTML = "&nbsp;";
+            colorRow2.children[i].innerHTML = "&nbsp;";
+        }
+        
+        // mark this cell as the selected color cell
+        const colorCell = (event.target as HTMLElement);
+        colorCell.innerText = "C";
+        
+        // set selected color
+        const colorCellId = colorCell.id;
+        const parts = colorCellId.split("-");
+        this.color = parts[1];
     }
     
     private textOkEventHandler = () => {
