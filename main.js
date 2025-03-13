@@ -386,6 +386,24 @@ var DrawingApp = /** @class */ (function () {
             var parts = colorCellId.split("-");
             _this.color = parts[1];
         };
+        this.lineSizeEventHandler = function (event) {
+            var cells = document.getElementsByTagName("td");
+            for (var i = 0; i < cells.length; i++) {
+                var cell = cells[i];
+                if (cell.id.indexOf("lineSize-") == 0) {
+                    var cellId = cell.id;
+                    var idParts = cellId.split("-");
+                    cell.innerHTML = idParts[1];
+                }
+            }
+            // mark this cell as the selected line size cell
+            var lineSizeCell = event.target;
+            lineSizeCell.innerText += "*";
+            // set selected line size
+            var lineSizeCellId = lineSizeCell.id;
+            var parts = lineSizeCellId.split("-");
+            _this.context.lineWidth = parseInt(parts[1]);
+        };
         this.textOkEventHandler = function () {
             _this.textOk();
         };
@@ -530,6 +548,9 @@ var DrawingApp = /** @class */ (function () {
             var cell = cells[i];
             if (cell.id.indexOf("color-") == 0) {
                 cell.addEventListener("click", this.colorEventHandler);
+            }
+            if (cell.id.indexOf("lineSize-") == 0) {
+                cell.addEventListener("click", this.lineSizeEventHandler);
             }
         }
         document.getElementById('width-select')

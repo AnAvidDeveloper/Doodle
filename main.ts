@@ -395,6 +395,9 @@ class DrawingApp {
             if (cell.id.indexOf("color-") == 0) {
                 cell.addEventListener("click", this.colorEventHandler);
             }
+            if (cell.id.indexOf("lineSize-") == 0) {
+                cell.addEventListener("click", this.lineSizeEventHandler);
+            }
         }
                                                       
         document.getElementById('width-select')
@@ -637,6 +640,27 @@ class DrawingApp {
         const parts = colorCellId.split("-");
         this.color = parts[1];
     }
+    
+    private lineSizeEventHandler = (event: Event) => {
+       const cells = document.getElementsByTagName("td");
+        for (let i = 0; i < cells.length; i++) {
+            const cell = cells[i];
+            if (cell.id.indexOf("lineSize-") == 0) {
+                const cellId = cell.id;
+                const idParts = cellId.split("-");
+                cell.innerHTML = idParts[1];
+            }
+        }
+                
+        // mark this cell as the selected line size cell
+        const lineSizeCell = (event.target as HTMLElement);
+        lineSizeCell.innerText += "*";
+        
+        // set selected line size
+        const lineSizeCellId = lineSizeCell.id;
+        const parts = lineSizeCellId.split("-");
+        this.context.lineWidth = parseInt(parts[1]);
+    }    
     
     private textOkEventHandler = () => {
         this.textOk();
